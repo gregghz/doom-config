@@ -60,6 +60,10 @@
   (lsp-mode . dap-mode)
   (lsp-mode . dap-ui-mode))
 
+(use-package! groovy-mode
+  :config
+  (setq groovy-indent-offset 2))
+
 (use-package! lsp-mode
   :hook
   (lsp-mode . lsp-lens-mode)

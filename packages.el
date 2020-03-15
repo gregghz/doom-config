@@ -51,3 +51,5 @@
 ;(package! builtin-package :recipe (:branch "develop"))
 
 (unpin! lsp-mode lsp-ui dap-mode)
+
+(package! restclient)
