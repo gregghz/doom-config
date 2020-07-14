@@ -55,37 +55,58 @@
 (setq backup-directory-alist `((".*" . ,temporary-file-directory))
       auto-save-file-name-transforms `((".*" ,temporary-file-directory)))
 
-(use-package! dap-mode
-  :hook
-  (lsp-mode . dap-mode)
-  (lsp-mode . dap-ui-mode))
+(after! compile
+  (add-to-list 'compilation-error-regexp-alist-alist '(bloop "^\\[E\\] \\([A-Za-z0-9-\\._/]+\\):\\([0-9]+\\):\\([0-9]+\\):.*$" 1 2 3))
+  (add-to-list 'compilation-error-regexp-alist 'bloop))
+
+(use-package! bloop
+  :load-path "~/.doom.d/bloop"
+  :after scala-mode
+  :config
+  (map! :map scala-mode-map
+        :leader
+        (:prefix ("c b" . "Bloop")
+         :desc "Compile" "y" 'bloop-compile
+         :desc "Test" "t" 'bloop-test
+         :desc "Test-only" "o" 'bloop-test-only
+         :desc "Clean" "c" 'bloop-clean)
+        ))
 
 (use-package! groovy-mode
   :config
   (setq groovy-indent-offset 2))
 
 (use-package! lsp-mode
-  :hook
-  (lsp-mode . lsp-lens-mode)
-  (lsp-mode . lsp-enable-which-key-integration)
   :config
   (setq
    lsp-file-watch-threshold 20000))
 
-(use-package! lsp-treemacs
-  :config
-  (lsp-metals-treeview-enable t)
-  (setq lsp-metals-treeview-show-when-views-received t))
-
-(use-package! magit
-  :bind (("C-M-s-g" . magit-status)))
-
 (use-package! projectile
   :config
-  (define-key projectile-mode-map (kbd "s-p") 'projectile-command-map))
+  (setq projectile-project-search-path "~/workspace")
+
+  (defun scalafilep (file)
+    (and (or (string-suffix-p ".scala" file) (string-suffix-p ".sbt" file)) (file-exists-p file)))
+
+  (defun prepend-path (files path)
+    (defun pp (file)
+      (concat path "/" file))
+
+    (mapcar 'pp files))
+
+  (defun scalafmt-project ()
+    (interactive)
+    (let* ((root (projectile-project-root))
+           (changed-files (prepend-path (magit-changed-files "master") root))
+           (filtered-changed-files (seq-filter 'scalafilep changed-files))
+           (changed-files-str (string-join filtered-changed-files " "))
+           (cmd (format "scalafmt -c %s/.scalafmt.conf %s" root changed-files-str)))
+      (message (format "Formatting %s" changed-files-str))
+      (shell-command cmd))))
 
 (use-package! sbt-mode
   :bind (("C-c C-h" . sbt-hydra))
+  :after scala-mode
   :hook
   (sbt-mode . +word-wrap-mode)
   :config
@@ -98,16 +119,16 @@
    minibuffer-local-completion-map))
 
 (use-package! scala-mode
+  :after bloop
   :mode "\\.s\\(cala\\|bt\\|c\\)$"
   :bind (("C-c C-h" . sbt-hydra)))
 
-(defun duplicate-line()
-  (interactive)
-  (move-beginning-of-line 1)
-  (kill-line)
-  (yank)
-  (open-line 1)
-  (next-line 1)
-  (yank))
+(use-package! typescript-mode
+  :config
+  (setq typescript-indent-level 2))
 
-(map! "C-c d" #'duplicate-line)
+(use-package! web-mode
+  :config
+  (setq web-mode-markup-indent-offset 2)
+  (setq web-mode-css-indent-offset 2)
+  (setq web-mode-code-indent-offset 2))
