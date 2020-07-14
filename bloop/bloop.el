@@ -77,7 +77,7 @@
 (defun bloop-current-project ()
   (shell-command-to-string (concat "~/.doom.d/bin/current-bloop-project.py --file " (buffer-file-name))))
 
-(defun bloop-exec (comint root command &rest args)
+(defun bloop-exec (root command &rest args)
   (unless command (error "Missing argument `command'."))
 
   (let* ((buffer-name (bloop-buffer-name root command))
@@ -90,51 +90,35 @@
                      "See `bloop-program-name' variable.")
              bloop-program-name))
 
-    (if comint
-        (with-current-buffer (get-buffer-create buffer-name)
-          (pop-to-buffer-same-window (current-buffer))
-          ;; (read-only-mode)
-          (buffer-disable-undo)
-          (if (comint-check-proc (current-buffer))
-              (error "A bloop command is still running!")
-            ;; TODO: Maybe save buffers?
-            (cd root)
-            (erase-buffer)
-            (insert (concat root "$ " full-command))
-            (newline 2)
-            (comint-mode)
-            ;; (compilation-shell-minor-mode)
-            (comint-exec (current-buffer) buffer-name bloop-program-name nil (cons command args))
-            (current-buffer)))
-      (let ((compilation-buffer-name-function (lambda (mode) buffer-name)))
-        (cd root)
-        (compile full-command)))))
+    (let ((compilation-buffer-name-function (lambda (mode) buffer-name)))
+      (cd root)
+      (compile full-command t))))
 
 
 (defun bloop-compile ()
   (interactive)
   (let* ((root (bloop-find-root (buffer-file-name)))
          (project-name (bloop-current-project)))
-    (bloop-exec nil root "compile" "--reporter" bloop-reporter project-name)))
+    (bloop-exec root "compile" "--reporter" bloop-reporter project-name)))
 
 (defun bloop-test ()
   (interactive)
   (let* ((root (bloop-find-root (buffer-file-name)))
          (project-name (bloop-current-project)))
-    (bloop-exec nil root "test" "--reporter" bloop-reporter project-name)))
+    (bloop-exec root "test" "--reporter" bloop-reporter project-name)))
 
 (defun bloop-test-only ()
   (interactive)
   (let* ((root (bloop-find-root (buffer-file-name)))
          (project-name (bloop-current-project))
          (target-test (concat "*" (replace-regexp-in-string ".scala" "" (car (last (split-string (buffer-file-name) "/")))))))
-    (bloop-exec nil root "test" "--reporter" bloop-reporter "--only" target-test project-name)))
+    (bloop-exec root "test" "--reporter" bloop-reporter "--only" target-test project-name)))
 
 (defun bloop-clean ()
   (interactive)
   (let* ((root (bloop-find-root (buffer-file-name)))
          (project-name (bloop-current-project)))
-    (bloop-exec nil root "clean" project-name)))
+    (bloop-exec root "clean" project-name)))
 
 (defun bloop-show-current-project ()
   (interactive)

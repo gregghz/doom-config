@@ -56,7 +56,7 @@
       auto-save-file-name-transforms `((".*" ,temporary-file-directory)))
 
 (after! compile
-  (add-to-list 'compilation-error-regexp-alist-alist '(bloop "^\\[E\\] \\([A-Za-z0-9-\\._/]+\\):\\([0-9]+\\):\\([0-9]+\\):.*$" 1 2 3))
+  (add-to-list 'compilation-error-regexp-alist-alist '(bloop "^\\[E\\] \\([A-Za-z0-9\\._/-]+\\):\\([0-9]+\\):\\([0-9]+\\):.*$" 1 2 3))
   (add-to-list 'compilation-error-regexp-alist 'bloop))
 
 (use-package! bloop
