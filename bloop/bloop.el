@@ -31,7 +31,7 @@
   :type 'string
   :group 'bloop)
 
-(defun bloop-buffer-name (root command)
+(defun bloop-buffer-name (command)
   (concat "*bloop-" command "*"))
 
 (defun bloop-directory (root)
@@ -77,10 +77,13 @@
 (defun bloop-current-project ()
   (shell-command-to-string (concat "~/.doom.d/bin/current-bloop-project.py --file " (buffer-file-name))))
 
+(defvar bloop-previous-command "compile")
+(defvar bloop-previous-full-command "bloop compile")
+
 (defun bloop-exec (root command &rest args)
   (unless command (error "Missing argument `command'."))
 
-  (let* ((buffer-name (bloop-buffer-name root command))
+  (let* ((buffer-name (bloop-buffer-name command))
          (raw-command (cons bloop-program-name (cons command args)))
          (full-command (string-join (mapcar 'shell-quote-argument raw-command) " "))
          (inhibit-read-only 1))
@@ -92,8 +95,17 @@
 
     (let ((compilation-buffer-name-function (lambda (mode) buffer-name)))
       (cd root)
+      (setq bloop-previous-full-command full-command)
+      (setq bloop-previous-command command)
       (compile full-command t))))
 
+(defun bloop-repeat ()
+  (interactive)
+  (let* ((root (bloop-find-root (buffer-file-name)))
+         (buffer-name (bloop-buffer-name bloop-previous-command))
+         (compilation-buffer-name-function (lambda (mode) buffer-name)))
+    (cd root)
+    (compile bloop-previous-full-command t)))
 
 (defun bloop-compile ()
   (interactive)
@@ -101,11 +113,23 @@
          (project-name (bloop-current-project)))
     (bloop-exec root "compile" "--reporter" bloop-reporter project-name)))
 
+(defun bloop-cascade-compile ()
+  (interactive)
+  (let* ((root (bloop-find-root (buffer-file-name)))
+         (project-name (bloop-current-project)))
+    (bloop-exec root "compile" "--reporter" bloop-reporter "--cascade" project-name)))
+
 (defun bloop-test ()
   (interactive)
   (let* ((root (bloop-find-root (buffer-file-name)))
          (project-name (bloop-current-project)))
     (bloop-exec root "test" "--reporter" bloop-reporter project-name)))
+
+(defun bloop-test-compile ()
+  (interactive)
+  (let* ((root (bloop-find-root (buffer-file-name)))
+         (project-name (bloop-current-project)))
+    (bloop-exec root "compile" "--reporter" bloop-reporter (concat project-name "-test"))))
 
 (defun bloop-test-only ()
   (interactive)

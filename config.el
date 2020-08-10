@@ -57,7 +57,9 @@
 
 (after! compile
   (add-to-list 'compilation-error-regexp-alist-alist '(bloop "^\\[E\\] \\([A-Za-z0-9\\._/-]+\\):\\([0-9]+\\):\\([0-9]+\\):.*$" 1 2 3))
-  (add-to-list 'compilation-error-regexp-alist 'bloop))
+  (add-to-list 'compilation-error-regexp-alist 'bloop)
+  ;(add-hook 'comint-mode-hook +word-wrap-mode)
+)
 
 (use-package! bloop
   :load-path "~/.doom.d/bloop"
@@ -66,11 +68,13 @@
   (map! :map scala-mode-map
         :leader
         (:prefix ("c b" . "Bloop")
-         :desc "Compile" "y" 'bloop-compile
+         :desc "Compile" "c" 'bloop-compile
+         :desc "Compile Cascade" "y" 'bloop-cascade-compile
+         :desc "Test Compile" "j" 'bloop-test-compile
          :desc "Test" "t" 'bloop-test
          :desc "Test-only" "o" 'bloop-test-only
-         :desc "Clean" "c" 'bloop-clean)
-        ))
+         :desc "Clean" "l" 'bloop-clean
+         :desc "Repeat" "a" 'bloop-repeat)))
 
 (use-package! groovy-mode
   :config
