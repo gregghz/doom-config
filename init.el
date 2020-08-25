@@ -24,6 +24,9 @@
        ;;ido               ; the other *other* search engine...
        (ivy +childframe +icons +prescient +fuzzy)               ; a search engine for love and life
 
+       :os
+       macos
+
        :ui
        ;;deft              ; notational velocity for Emacs
        doom              ; what makes DOOM look the way it does
@@ -94,7 +97,6 @@
        (lookup           ; helps you navigate your code and documentation
         +docsets)        ; ...or in Dash docsets locally
        (lsp +peek)
-       macos             ; MacOS-specific commands
        magit             ; a git porcelain for Emacs
        ;;make              ; run make tasks from Emacs
        ;;pass              ; password manager for nerds
