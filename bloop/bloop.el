@@ -75,7 +75,7 @@
     project))
 
 (defun bloop-current-project ()
-  (shell-command-to-string (concat "~/.doom.d/bin/current-bloop-project.py --file " (buffer-file-name))))
+  (shell-command-to-string (concat "~/.doom.d/bin/current-bloop-project.py --file '" (buffer-file-name) "'")))
 
 (defvar bloop-previous-command "compile")
 (defvar bloop-previous-full-command "bloop compile")

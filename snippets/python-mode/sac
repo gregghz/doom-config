@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sac
+# key: sac
+# --
+$1_chart = TimeSeriesChart().with_name("$2").with_program(Program($3))

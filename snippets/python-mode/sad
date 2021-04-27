@@ -1,0 +1,5 @@
+# -*- mode: snippet -*-
+# name: sad
+# key: sad
+# --
+$1_data = Data("$2").publish()

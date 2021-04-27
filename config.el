@@ -61,10 +61,13 @@
   ;(add-hook 'comint-mode-hook +word-wrap-mode)
 )
 
+(add-hook 'compilation-mode #'+word-wrap-mode)
+
 (use-package! bloop
   :load-path "~/.doom.d/bloop"
   :after scala-mode
   :config
+  (set-popup-rule! "^\\*bloop-.*\\*$" :side 'bottom :quit 'current :select nil :height 30)
   (map! :map scala-mode-map
         :leader
         (:prefix ("c b" . "Bloop")
@@ -80,10 +83,19 @@
   :config
   (setq groovy-indent-offset 2))
 
+(use-package! lsp-metals
+  :config
+  (setq
+   lsp-metals-super-method-lenses-enabled t
+   lsp-metals-show-implicit-arguments t
+   lsp-metals-show-implicit-conversions-and-classes t
+   lsp-metals-show-inferred-type t))
+
 (use-package! lsp-mode
   :config
   (setq
-   lsp-file-watch-threshold 20000))
+   lsp-file-watch-threshold 20000
+   lsp-headerline-breadcrumb-enable t))
 
 (use-package! projectile
   :config

@@ -56,3 +56,6 @@
 ;(package! lsp-metals :pin "2d7e06ae5fff226f8674d798b32a9ec84517698a")
 ;(package! lsp-mode :pin "7e47b706aebee13aed9bd7db54b6c0726d84688c")
 ;(package! treemacs :pin "399e82b24817218cf6bcf2145d1620d7feff63e6")
+(package! terraform-mode)
+
+(unpin! lsp-metals)

@@ -1,0 +1,7 @@
+# -*- mode: snippet -*-
+# name: sfx
+# key: sfx
+# --
+$1_mean_data = Data("rfid.$2", rollup="average",).mean(by="aws_region").publish()
+$1_max_data = Data("rfid.$2", rollup="max",).max(by="aws_region").publish()
+$1_chart = TimeSeriesChart().with_name("$3").with_program(Program($1_mean_data, $1_max_data))
