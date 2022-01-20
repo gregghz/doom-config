@@ -53,9 +53,10 @@
 (package! restclient :pin "ac8aad6c6b9e9d918062fa3c89c22c2f4ec48bc3")
 ;(package! lsp-treemacs :pin "6fd9160123b9f9a31d3f85670cc64c3d41a2c79b")
 (package! shader-mode)
-;(package! lsp-metals :pin "2d7e06ae5fff226f8674d798b32a9ec84517698a")
 ;(package! lsp-mode :pin "7e47b706aebee13aed9bd7db54b6c0726d84688c")
 ;(package! treemacs :pin "399e82b24817218cf6bcf2145d1620d7feff63e6")
 (package! terraform-mode)
-
+(package! git-link)
+(package! forge)
+(package! lua-mode)
 (unpin! lsp-metals)

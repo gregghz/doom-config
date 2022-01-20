@@ -55,11 +55,13 @@
 (setq backup-directory-alist `((".*" . ,temporary-file-directory))
       auto-save-file-name-transforms `((".*" ,temporary-file-directory)))
 
+(setq compilation-skip-threshold 2)
+
 (after! compile
   (add-to-list 'compilation-error-regexp-alist-alist '(bloop "^\\[E\\] \\([A-Za-z0-9\\._/-]+\\):\\([0-9]+\\):\\([0-9]+\\):.*$" 1 2 3))
   (add-to-list 'compilation-error-regexp-alist 'bloop)
-  ;(add-hook 'comint-mode-hook +word-wrap-mode)
-)
+                                        ;(add-hook 'comint-mode-hook +word-wrap-mode)
+  )
 
 (add-hook 'compilation-mode #'+word-wrap-mode)
 
@@ -79,6 +81,13 @@
          :desc "Clean" "l" 'bloop-clean
          :desc "Repeat" "a" 'bloop-repeat)))
 
+(use-package! forge
+  :after magit
+  :config
+  (setq auth-sources
+        '(macos-keychain-generic macos-keychain-internet "/Users/ghernandez/.emacs.d/.local/etc/authinfo.gpg" "~/.authinfo.gpg" "~/.authinfo")
+        ))
+
 (use-package! groovy-mode
   :config
   (setq groovy-indent-offset 2))
@@ -95,7 +104,21 @@
   :config
   (setq
    lsp-file-watch-threshold 20000
-   lsp-headerline-breadcrumb-enable t))
+   lsp-ui-doc-enable t
+   lsp-ui-doc-position 'top
+   lsp-ui-doc-show-with-cursor nil
+   lsp-ui-doc-show-with-mouse t))
+
+(use-package! magit
+  :config (setq magit-repository-directories
+                `(("~/worksapce" . 1))))
+
+;; (use-package! magithub
+;;   :after magit
+;;   :config (magithub-feature-autoinject t)
+;;   (setq auth-sources
+;;         '(macos-keychain-generic macos-keychain-internet "/Users/ghernandez/.emacs.d/.local/etc/authinfo.gpg" "~/.authinfo.gpg" "~/.authinfo")
+;;         ))
 
 (use-package! projectile
   :config
@@ -148,3 +171,16 @@
   (setq web-mode-markup-indent-offset 2)
   (setq web-mode-css-indent-offset 2)
   (setq web-mode-code-indent-offset 2))
+
+(defun lsp-find-workspace (server-id &optional file-name)
+  "Find workspace for SERVER-ID for FILE-NAME."
+  (-when-let* ((session (lsp-session))
+               (folder->servers (lsp-session-folder->servers session))
+               (workspaces (if file-name
+                               (let* ((folder (lsp-find-session-folder session file-name))
+                                      (folder-last-char (substring folder (- (length folder) 1) (length folder)))
+                                      (key (if (string= folder-last-char "/") (substring folder 0 (- (length folder) 1)) folder)))
+                                 (gethash key folder->servers))
+                             (lsp--session-workspaces session))))
+
+    (--first (eq (lsp--client-server-id (lsp--workspace-client it)) server-id) workspaces)))
